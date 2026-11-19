@@ -1,6 +1,10 @@
 package com.devsuperior.dsmovie.controllers;
 
 import static io.restassured.RestAssured.baseURI;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
 
 import org.json.JSONException;
 import org.json.simple.JSONObject;
@@ -42,14 +46,51 @@ public class ScoreControllerRA {
 	}
 	
 	@Test
-	public void saveScoreShouldReturnNotFoundWhenMovieIdDoesNotExist() throws Exception {		
+	public void saveScoreShouldReturnNotFoundWhenMovieIdDoesNotExist() throws Exception {
+		given()
+			.header("Authorization", "Bearer " + clientToken)
+			.contentType("application/json")
+			.body(scoreWithNonexistentMovie.toJSONString())
+		.when()
+			.put("/scores")
+		.then()
+			.statusCode(404)
+			.body("status", is(404))
+			.body("error", equalTo("Recurso não encontrado"))
+			.body("path", equalTo("/scores"));
 	}
 	
 	@Test
 	public void saveScoreShouldReturnUnprocessableEntityWhenMissingMovieId() throws Exception {
+		given()
+			.header("Authorization", "Bearer " + clientToken)
+			.contentType("application/json")
+			.body(scoreWithMissingMovieId.toJSONString())
+		.when()
+			.put("/scores")
+		.then()
+			.statusCode(422)
+			.body("status", is(422))
+			.body("error", equalTo("Dados inválidos"))
+			.body("path", equalTo("/scores"))
+			.body("errors.fieldName", hasItem("movieId"))
+			.body("errors.message", hasItem("Campo requerido"));
 	}
 	
 	@Test
-	public void saveScoreShouldReturnUnprocessableEntityWhenScoreIsLessThanZero() throws Exception {		
+	public void saveScoreShouldReturnUnprocessableEntityWhenScoreIsLessThanZero() throws Exception {
+		given()
+			.header("Authorization", "Bearer " + clientToken)
+			.contentType("application/json")
+			.body(scoreWithNegativeValue.toJSONString())
+		.when()
+			.put("/scores")
+		.then()
+			.statusCode(422)
+			.body("status", is(422))
+			.body("error", equalTo("Dados inválidos"))
+			.body("path", equalTo("/scores"))
+			.body("errors.fieldName", hasItem("score"))
+			.body("errors.message", hasItem("Valor mínimo 0"));
 	}
 }
