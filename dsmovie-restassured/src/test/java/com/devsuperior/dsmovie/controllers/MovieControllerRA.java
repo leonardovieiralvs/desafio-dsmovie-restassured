@@ -4,6 +4,7 @@ import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -97,14 +98,43 @@ public class MovieControllerRA {
 	}
 	
 	@Test
-	public void insertShouldReturnUnprocessableEntityWhenAdminLoggedAndBlankTitle() throws JSONException {		
+	public void insertShouldReturnUnprocessableEntityWhenAdminLoggedAndBlankTitle() throws JSONException {
+		given()
+			.header("Authorization", "Bearer " + adminToken)
+			.contentType("application/json")
+			.body(movieWithBlankTitle)
+		.when()
+			.post("/movies")
+		.then()
+			.statusCode(422)
+			.body("status", is(422))
+			.body("error", equalTo("Dados inválidos"))
+			.body("path", equalTo("/movies"))
+			.body("errors.fieldName", hasItem("title"))
+			.body("errors.message", hasItem("Campo requerido"));
 	}
 	
 	@Test
 	public void insertShouldReturnForbiddenWhenClientLogged() throws Exception {
+		given()
+			.header("Authorization", "Bearer " + clientToken)
+			.contentType("application/json")
+			.body(movieWithValidTitle)
+		.when()
+			.post("/movies")
+		.then()
+			.statusCode(403);
 	}
 	
 	@Test
 	public void insertShouldReturnUnauthorizedWhenInvalidToken() throws Exception {
+		given()
+			.header("Authorization", "Bearer " + invalidToken)
+			.contentType("application/json")
+			.body(movieWithValidTitle)
+		.when()
+			.post("/movies")
+		.then()
+			.statusCode(401);
 	}
 }
