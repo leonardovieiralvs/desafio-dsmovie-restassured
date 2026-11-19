@@ -76,11 +76,24 @@ public class MovieControllerRA {
 	}
 	
 	@Test
-	public void findByIdShouldReturnMovieWhenIdExists() {		
+	public void findByIdShouldReturnMovieWhenIdExists() {
+		given()
+			.get("/movies/{id}", existingMovieId)
+		.then()
+			.statusCode(200)
+			.body("id", is(existingMovieId.intValue()))
+			.body("title", equalTo(movieTitle));
 	}
 	
 	@Test
-	public void findByIdShouldReturnNotFoundWhenIdDoesNotExist() {	
+	public void findByIdShouldReturnNotFoundWhenIdDoesNotExist() {
+		given()
+			.get("/movies/{id}", nonExistingMovieId)
+		.then()
+			.statusCode(404)
+			.body("status", is(404))
+			.body("error", equalTo("Recurso não encontrado"))
+			.body("path", equalTo("/movies/" + nonExistingMovieId));
 	}
 	
 	@Test
