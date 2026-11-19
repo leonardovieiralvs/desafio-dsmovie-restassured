@@ -65,8 +65,3 @@ mvn test -Dtest="MovieControllerRA,ScoreControllerRA"
 
 - Os testes dependem dos dados iniciais (seed) da aplicação, como o filme de id 1 (*The Witcher*) e os usuários de teste, usados para obter os tokens de admin e de cliente por meio da classe `TokenUtil`.
 - Os testes de inserção (`POST /movies`) e de avaliação (`PUT /scores`) gravam dados no banco. Com o banco H2 do perfil de teste, os dados são recriados a cada inicialização da aplicação.
-
-## Autor
-
-**Leonardo Vieira de Souza**
-[github.com/leonardovieiralvs](https://github.com/leonardovieiralvs)
