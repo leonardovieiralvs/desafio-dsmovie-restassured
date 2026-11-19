@@ -1,6 +1,10 @@
 package com.devsuperior.dsmovie.controllers;
 
 import static io.restassured.RestAssured.baseURI;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.empty;
 
 import org.json.JSONException;
 import org.json.simple.JSONObject;
@@ -47,6 +51,12 @@ public class MovieControllerRA {
 	
 	@Test
 	public void findAllShouldReturnOkWhenMovieNoArgumentsGiven() {
+		given()
+			.get("/movies")
+		.then()
+			.statusCode(200)
+			.body("content", not(empty()))
+			.body("content.title", hasItems("The Witcher", "Venom: Tempo de Carnificina"));
 	}
 	
 	@Test
