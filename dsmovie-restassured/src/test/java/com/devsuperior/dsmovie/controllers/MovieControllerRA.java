@@ -2,15 +2,17 @@ package com.devsuperior.dsmovie.controllers;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+
 
 import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import com.devsuperior.dsmovie.tests.TokenUtil;
 
 public class MovieControllerRA {
@@ -60,7 +62,17 @@ public class MovieControllerRA {
 	}
 	
 	@Test
-	public void findAllShouldReturnPagedMoviesWhenMovieTitleParamIsNotEmpty() {		
+	public void findAllShouldReturnPagedMoviesWhenMovieTitleParamIsNotEmpty() {
+		given()
+			.queryParam("title", movieTitle)
+			.queryParam("page", 0)
+			.queryParam("size", 12)
+			.get("/movies")
+		.then()
+			.statusCode(200)
+			.body("content.size()", is(1))
+			.body("content[0].id", is(existingMovieId.intValue()))
+			.body("content[0].title", equalTo(movieTitle));
 	}
 	
 	@Test
